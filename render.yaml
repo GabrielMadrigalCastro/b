@@ -1,0 +1,33 @@
+# Blueprint de Render: solo el servicio web.
+# La base de datos la provee Supabase (Session pooler), no Render.
+# La contraseña de Supabase se define en el dashboard de Render como secreto.
+
+services:
+  - type: web
+    name: backend-delta
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      # Activa el perfil de produccion para Render
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      # Contraseña de la base Supabase (se ingresa manualmente en Render, no en git)
+      - key: SUPABASE_DB_PASSWORD
+        sync: false
+      # Reset de datos: poner en 'true' UNA vez para borrar todo y sembrar el
+      # par de prueba; volver a 'false' luego para no borrar en cada reinicio.
+      - key: RESET_DATA
+        value: "false"
+      # ---- IA: orden de proveedores gratis con respaldo (fallback) ----
+      # Se prueban en este orden; si uno falla o no tiene key, pasa al siguiente.
+      - key: AI_PROVIDER_ORDER
+        value: gemini,groq,mistral
+      # API keys de IA (se ingresan como secretos en el dashboard de Render).
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
